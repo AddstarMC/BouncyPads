@@ -1,0 +1,12 @@
+debug: false
+
+pads:
+  bouncy:
+    top: STONE_PLATE
+    middle: REDSTONE_BLOCK
+    bottom: SPONGE
+    velocity: 1
+    multiplier: 3
+    sound: ENDERDRAGON_HIT
+    effect: ENDER_SIGNAL
+    message: "&eWeeeeeeeeeeee!"
