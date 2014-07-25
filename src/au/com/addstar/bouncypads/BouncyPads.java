@@ -10,6 +10,7 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -92,7 +93,15 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		Material pt = loc.getBlock().getType();
 		Material pm = null; // cached inside loop
 		Material pb = null; // cached inside loop
+
+		// Avoid tiggering while flying above bouncy pads
+		// NOTE: Does not avoid flying above non-solid blocks if player is inside the same block as the non-solid block
+		if ((pt == Material.AIR) && (loc.getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
+			loc.subtract(0, 1, 0);
+			pt = loc.getBlock().getType();  
+		}
 		
+		// Check the layers for relevant trigger combinations
 		for (PadType pad : PadList) {
 			if (pad.top == pt) {
 				if (pm == null) { pm = loc.subtract(0, 1, 0).getBlock().getType(); }		// cache the middle block type
