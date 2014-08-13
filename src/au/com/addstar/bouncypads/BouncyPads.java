@@ -83,9 +83,9 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		
 		for (PadType p : PadList) {
 			Debug("Pad config:");
-			Debug("  top       : " + p.top);
-			Debug("  middle    : " + p.middle);
-			Debug("  bottom    : " + p.bottom);
+			Debug("  top       : " + ((p.top == null) ? "ANY" : p.top));
+			Debug("  middle    : " + ((p.middle == null) ? "ANY" : p.middle));
+			Debug("  bottom    : " + ((p.bottom == null) ? "ANY" : p.bottom));
 			Debug("  multiplier: " + p.multiplier);
 			Debug("  velocity  : " + p.velocity);
 			Debug("  sound     : " + p.sound);
