@@ -60,13 +60,13 @@ public class BouncyPads extends JavaPlugin implements Listener {
 
 				// Allow for "ANY" block (wildcard)
 				String tmp = conf.getString("pads." + pname + ".top").toUpperCase();
-				pad.top = (tmp == "ANY") ?  null : Material.valueOf(tmp);
+				pad.top = (tmp.equals("ANY")) ?  null : Material.valueOf(tmp);
 
 				tmp = conf.getString("pads." + pname + ".middle").toUpperCase();
-				pad.middle = (tmp == "ANY") ?  null : Material.valueOf(tmp);
+				pad.middle = (tmp.equals("ANY")) ?  null : Material.valueOf(tmp);
 
 				tmp = conf.getString("pads." + pname + ".bottom").toUpperCase();
-				pad.bottom = (tmp == "ANY") ?  null : Material.valueOf(tmp);
+				pad.bottom = (tmp.equals("ANY")) ?  null : Material.valueOf(tmp);
 
 				pad.multiplier = conf.getDouble("pads." + pname + ".multiplier", 1);
 				pad.velocity = conf.getDouble("pads." + pname + ".velocity", 3);
