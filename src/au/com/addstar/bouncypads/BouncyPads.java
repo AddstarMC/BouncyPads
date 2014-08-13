@@ -62,10 +62,10 @@ public class BouncyPads extends JavaPlugin implements Listener {
 				String tmp = conf.getString("pads." + pname + ".top").toUpperCase();
 				pad.top = (tmp == "ANY") ?  null : Material.valueOf(tmp);
 
-				String tmp = conf.getString("pads." + pname + ".middle").toUpperCase();
+				tmp = conf.getString("pads." + pname + ".middle").toUpperCase();
 				pad.middle = (tmp == "ANY") ?  null : Material.valueOf(tmp);
 
-				String tmp = conf.getString("pads." + pname + ".bottom").toUpperCase();
+				tmp = conf.getString("pads." + pname + ".bottom").toUpperCase();
 				pad.bottom = (tmp == "ANY") ?  null : Material.valueOf(tmp);
 
 				pad.multiplier = conf.getDouble("pads." + pname + ".multiplier", 1);
