@@ -57,9 +57,17 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		for (String pname : pads) {
 			try {
 				PadType pad = new PadType();
-				pad.top = Material.valueOf(conf.getString("pads." + pname + ".top").toUpperCase());
-				pad.middle = Material.valueOf(conf.getString("pads." + pname + ".middle").toUpperCase());
-				pad.bottom = Material.valueOf(conf.getString("pads." + pname + ".bottom").toUpperCase());
+
+				// Allow for "ANY" block (wildcard)
+				String tmp = conf.getString("pads." + pname + ".top").toUpperCase();
+				pad.top = (tmp == "ANY") ?  null : Material.valueOf(tmp);
+
+				String tmp = conf.getString("pads." + pname + ".middle").toUpperCase();
+				pad.middle = (tmp == "ANY") ?  null : Material.valueOf(tmp);
+
+				String tmp = conf.getString("pads." + pname + ".bottom").toUpperCase();
+				pad.bottom = (tmp == "ANY") ?  null : Material.valueOf(tmp);
+
 				pad.multiplier = conf.getDouble("pads." + pname + ".multiplier", 1);
 				pad.velocity = conf.getDouble("pads." + pname + ".velocity", 3);
 				pad.sound = Sound.valueOf(conf.getString("pads." + pname + ".sound").toUpperCase());
@@ -103,9 +111,10 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		
 		// Check the layers for relevant trigger combinations
 		for (PadType pad : PadList) {
-			if (pad.top == pt) {
+			if ((pad.top == null) || (pad.top == pt)) {
 				if (pm == null) { pm = loc.subtract(0, 1, 0).getBlock().getType(); }		// cache the middle block type
-				if (pad.middle == pm) {
+				if ((pad.middle == null) || (pad.middle == pm)) {
+					if (pad.bottom == null) { return pad; }		// Wildcard on bottom block, don't bother checking it
 					if (pb == null) { pb = loc.subtract(0, 1, 0).getBlock().getType(); }	// cache the bottom block type
 					if (pad.bottom == pb) {
 						// We found a BouncyPad! Return it
