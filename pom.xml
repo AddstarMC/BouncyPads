@@ -6,22 +6,6 @@
   <name>BouncyPads</name>
 
   <repositories>
-    <!-- For spigot -->
-    <repository>
-      <id>md5-repo</id>
-      <url>http://repo.md-5.net/content/groups/public/</url>
-      <releases><enabled>true</enabled></releases>
-      <snapshots><enabled>true</enabled></snapshots>
-    </repository>
-
-    <repository>
-      <id>bukkit-maven</id>
-      <url>http://repo.bukkit.org/content/repositories/releases/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    
     <!-- Addstar repos -->
     <repository>
       <id>addstar-repo</id>
@@ -41,6 +25,14 @@
       </releases>
     </repository>
 
+    <!-- For spigot -->
+    <repository>
+      <id>md5-repo</id>
+      <url>http://repo.md-5.net/content/groups/public/</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+
     <!-- Maven central -->
     <repository>
       <id>maven-central</id>
@@ -53,7 +45,7 @@
     <dependency>
     	<groupId>org.spigotmc</groupId>
     	<artifactId>spigot</artifactId>
-    	<version>1.7.9-R0.3-SNAPSHOT</version>
+    	<version>1.8.8-R0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
