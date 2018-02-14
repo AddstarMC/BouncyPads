@@ -1,5 +1,0 @@
-name: BouncyPads
-version: ${pom.version}
-description: Bukkit plugin with many miscellaneous features specifically created for Addstar MC
-main: au.com.addstar.bouncypads.BouncyPads
-softdepend: [Multiverse-Core]

@@ -2,9 +2,45 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.com.addstar</groupId>
   <artifactId>BouncyPads</artifactId>
-  <version>b${env.BUILD_NUMBER}</version>
+  <version>1.0.0</version>
   <name>BouncyPads</name>
-
+  <description>Bukkit plugin with many miscellaneous features specifically created for Addstar MC</description>
+  <properties>
+    <build.number/>
+    <plugin.version>${project.version}-${build.number}</plugin.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spigot.version>1.12.2-R0.1-SNAPSHOT</spigot.version>
+  </properties>
+  <scm>
+    <connection>scm:git:git@github.com:AddstarMC/BouncyPads.git</connection>
+    <developerConnection>scm:git:git@github.com:AddstarMC/BouncyPads.git</developerConnection>
+    <url>https://github.com/AddstarMC/BouncyPads</url>
+    <tag>HEAD</tag>
+  </scm>
+  <developers>
+    <developer>
+      <id>AddstarMC</id>
+      <name>AddstarMC</name>
+      <url>http://github.com/AddstarMC</url>
+      <roles>
+        <role>developer</role>
+        <role>maintainer</role>
+      </roles>
+      <timezone>10</timezone>
+    </developer>
+  </developers>
+  <distributionManagement>
+    <repository>
+      <id>maven.addstar.com.au</id>
+      <name>maven.addstar.com.au-releases</name>
+      <url>http://maven.addstar.com.au/artifactory/ext-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>maven.addstar.com.au</id>
+      <name>maven.addstar.com.au-snapshots</name>
+      <url>http://maven.addstar.com.au/artifactory/ext-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
   <repositories>
     <!-- Addstar repos -->
     <repository>
@@ -28,8 +64,10 @@
     <!-- For spigot -->
     <repository>
       <id>md5-repo</id>
-      <url>http://repo.md-5.net/content/groups/public/</url>
-      <releases><enabled>true</enabled></releases>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
       <snapshots><enabled>true</enabled></snapshots>
     </repository>
 
@@ -44,8 +82,8 @@
     <!-- We use Spigot now, not Bukkit -->
     <dependency>
     	<groupId>org.spigotmc</groupId>
-    	<artifactId>spigot</artifactId>
-    	<version>1.8.8-R0.1-SNAPSHOT</version>
+      <artifactId>spigot-api</artifactId>
+      <version>${spigot.version}</version>
     </dependency>
   </dependencies>
 
@@ -54,7 +92,7 @@
       <resource>
         <targetPath>.</targetPath>
         <filtering>true</filtering>
-        <directory>${basedir}/.</directory>
+        <directory>${basedir}/src/main/resources</directory>
         <includes>
           <include>plugin.yml</include>
           <include>config.yml</include>
@@ -62,15 +100,15 @@
       </resource>
     </resources>
 
-    <sourceDirectory>src</sourceDirectory>
+    <sourceDirectory>src/main/java</sourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>

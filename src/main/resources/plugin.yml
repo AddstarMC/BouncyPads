@@ -1,0 +1,5 @@
+name: BouncyPads
+version: ${plugin.version}
+description: ${project.description}
+main: au.com.addstar.bouncypads.BouncyPads
+softdepend: [Multiverse-Core]

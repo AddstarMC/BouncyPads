@@ -1,15 +1,6 @@
 package au.com.addstar.bouncypads;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -19,10 +10,14 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
-public class BouncyPads extends JavaPlugin implements Listener {
-	List<Player> bouncing = new ArrayList<Player>();
-	List<PadType> PadList = new ArrayList<PadType>();
-	boolean Debug = true; 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+class BouncyPads extends JavaPlugin implements Listener {
+    private final List<Player> bouncing = new ArrayList<>();
+    private final List<PadType> PadList = new ArrayList<>();
+    private boolean Debug = true;
 	
 	static class PadType {
 		Material top;
@@ -39,8 +34,8 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		loadConfig();
 		Bukkit.getPluginManager().registerEvents(this, this);
 	}
-	
-	public void Debug(String msg) {
+
+    private void Debug(String msg) {
 		if (Debug) {
 			getLogger().info(msg);
 		}
@@ -53,7 +48,7 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		
 		Debug = conf.getBoolean("debug", false);
 
-		Set<String> pads = (Set<String>) conf.getConfigurationSection("pads").getKeys(false);
+        Set<String> pads = conf.getConfigurationSection("pads").getKeys(false);
 		for (String pname : pads) {
 			try {
 				PadType pad = new PadType();
@@ -79,7 +74,7 @@ public class BouncyPads extends JavaPlugin implements Listener {
 				}
 				catch (Exception e) {
 					this.getLogger().warning("Invalid sound \"" + sound + "\" for \"" + pname + "\"!");
-					pad.sound = Sound.ENDERDRAGON_HIT; // set this as default
+                    pad.sound = Sound.ENTITY_ENDERDRAGON_HURT; // set this as default
 				}
 				PadList.add(pad);
 			}
@@ -152,11 +147,7 @@ public class BouncyPads extends JavaPlugin implements Listener {
 			if ((pad.msg != null) && (!pad.msg.isEmpty())) {
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', pad.msg));
 			}
-			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-				public void run() {
-					bouncing.remove(player);
-				}
-			}, 5L);
+            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> bouncing.remove(player), 5L);
 		}
 	}
 }
