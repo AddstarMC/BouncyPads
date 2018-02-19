@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-class BouncyPads extends JavaPlugin implements Listener {
+public class BouncyPads extends JavaPlugin implements Listener {
     private final List<Player> bouncing = new ArrayList<>();
     private final List<PadType> PadList = new ArrayList<>();
     private boolean Debug = true;
