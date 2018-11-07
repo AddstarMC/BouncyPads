@@ -9,7 +9,8 @@
     <build.number/>
     <plugin.version>${project.version}-${build.number}</plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spigot.version>1.12.2-R0.1-SNAPSHOT</spigot.version>
+    <spigot.api.version>1.13</spigot.api.version>
+    <spigot.version>1.13.2-R0.1-SNAPSHOT</spigot.version>
   </properties>
   <scm>
     <connection>scm:git:git@github.com:AddstarMC/BouncyPads.git</connection>

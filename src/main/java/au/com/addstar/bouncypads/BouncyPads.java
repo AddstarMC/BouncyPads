@@ -65,7 +65,13 @@ public class BouncyPads extends JavaPlugin implements Listener {
 
 				pad.multiplier = conf.getDouble("pads." + pname + ".multiplier", 1);
 				pad.velocity = conf.getDouble("pads." + pname + ".velocity", 3);
-				pad.effect = Effect.valueOf(conf.getString("pads." + pname + ".effect").toUpperCase());
+                String effect = conf.getString("pads." + pname + ".effect").toUpperCase();
+                try {
+                    pad.effect = Effect.valueOf(effect);
+                } catch (IllegalArgumentException e) {
+                    this.getLogger().warning("Invalid effect \"" + effect + "\" for \"" + pname + "\"!");
+                    pad.effect = Effect.CLICK1;
+                }
 				pad.msg = conf.getString("pads." + pname + ".message");
 
 				String sound = conf.getString("pads." + pname + ".sound").toUpperCase();
@@ -74,7 +80,7 @@ public class BouncyPads extends JavaPlugin implements Listener {
 				}
 				catch (Exception e) {
 					this.getLogger().warning("Invalid sound \"" + sound + "\" for \"" + pname + "\"!");
-                    pad.sound = Sound.ENTITY_ENDERDRAGON_HURT; // set this as default
+                    pad.sound = Sound.ENTITY_ENDER_DRAGON_HURT; // set this as default
 				}
 				PadList.add(pad);
 			}
