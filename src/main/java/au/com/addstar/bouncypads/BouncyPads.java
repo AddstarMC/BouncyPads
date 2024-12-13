@@ -19,7 +19,8 @@ public class BouncyPads extends JavaPlugin implements Listener {
     private final List<PadType> PadList = new ArrayList<>();
     private boolean Debug = true;
 	
-	static class PadType {
+	public static class PadType {
+		String name;
 		Material top;
 		Material middle;
 		Material bottom;
@@ -52,6 +53,7 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		for (String pname : pads) {
 			try {
 				PadType pad = new PadType();
+				pad.name = pname;
 
 				// Allow for "ANY" block (wildcard)
 				String tmp = conf.getString("pads." + pname + ".top").toUpperCase();
@@ -154,6 +156,9 @@ public class BouncyPads extends JavaPlugin implements Listener {
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', pad.msg));
 			}
             Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> bouncing.remove(player), 5L);
+
+			// Fire PlayerBouncedEvent (for other plugins to listen to)
+			Bukkit.getPluginManager().callEvent(new PlayerBouncedEvent(player, pad));
 		}
 	}
 }
