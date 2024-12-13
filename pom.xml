@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.com.addstar</groupId>
   <artifactId>BouncyPads</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
   <name>BouncyPads</name>
   <description>Bukkit plugin with many miscellaneous features specifically created for Addstar MC</description>
   <properties>

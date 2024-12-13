@@ -29,6 +29,18 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		Sound sound;
 		Effect effect;
 		String msg;
+
+		public String getName() {
+			return name;
+		}
+
+		public double getVelocity() {
+			return velocity;
+		}
+
+		public double getMultiplier() {
+			return multiplier;
+		}
 	}
 
 	public void onEnable() {
