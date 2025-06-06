@@ -1,6 +1,7 @@
 package au.com.addstar.bouncypads;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -10,12 +11,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class BouncyPads extends JavaPlugin implements Listener {
-    private final List<Player> bouncing = new ArrayList<>();
+    // Using a set avoids duplicates and provides O(1) contains/remove
+    private final Set<Player> bouncing = new HashSet<>();
     private final List<PadType> PadList = new ArrayList<>();
     private boolean Debug = true;
 	
@@ -44,8 +44,14 @@ public class BouncyPads extends JavaPlugin implements Listener {
 	}
 
 	public void onEnable() {
-		loadConfig();
+		if (!loadConfig())
+			getLogger().warning("No pads configured");
 		Bukkit.getPluginManager().registerEvents(this, this);
+	}
+
+	@Override
+	public void onDisable() {
+		bouncing.clear();
 	}
 
     private void Debug(String msg) {
@@ -61,40 +67,48 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		
 		Debug = conf.getBoolean("debug", false);
 
-        Set<String> pads = conf.getConfigurationSection("pads").getKeys(false);
+		if (conf.getConfigurationSection("pads") == null)
+			return false;
+
+		Set<String> pads = conf.getConfigurationSection("pads").getKeys(false);
 		for (String pname : pads) {
 			try {
 				PadType pad = new PadType();
 				pad.name = pname;
 
 				// Allow for "ANY" block (wildcard)
-				String tmp = conf.getString("pads." + pname + ".top").toUpperCase();
-				pad.top = (tmp.equals("ANY")) ?  null : Material.valueOf(tmp);
+				String tmp = conf.getString("pads." + pname + ".top", "ANY");
+				tmp = (tmp == null) ? "ANY" : tmp.toUpperCase();
+				pad.top = (tmp.equals("ANY")) ?	 null : Material.valueOf(tmp);
 
-				tmp = conf.getString("pads." + pname + ".middle").toUpperCase();
+				tmp = conf.getString("pads." + pname + ".middle", "ANY");
+				tmp = (tmp == null) ? "ANY" : tmp.toUpperCase();
 				pad.middle = (tmp.equals("ANY")) ?  null : Material.valueOf(tmp);
 
-				tmp = conf.getString("pads." + pname + ".bottom").toUpperCase();
+				tmp = conf.getString("pads." + pname + ".bottom", "ANY");
+				tmp = (tmp == null) ? "ANY" : tmp.toUpperCase();
 				pad.bottom = (tmp.equals("ANY")) ?  null : Material.valueOf(tmp);
 
 				pad.multiplier = conf.getDouble("pads." + pname + ".multiplier", 1);
 				pad.velocity = conf.getDouble("pads." + pname + ".velocity", 3);
-                String effect = conf.getString("pads." + pname + ".effect").toUpperCase();
-                try {
-                    pad.effect = Effect.valueOf(effect);
-                } catch (IllegalArgumentException e) {
-                    this.getLogger().warning("Invalid effect \"" + effect + "\" for \"" + pname + "\"!");
-                    pad.effect = Effect.CLICK1;
-                }
+		String effect = conf.getString("pads." + pname + ".effect", Effect.CLICK1.name());
+		effect = (effect == null) ? Effect.CLICK1.name() : effect.toUpperCase();
+		try {
+		    pad.effect = Effect.valueOf(effect);
+		} catch (IllegalArgumentException e) {
+		    this.getLogger().warning("Invalid effect \"" + effect + "\" for \"" + pname + "\"!");
+		    pad.effect = Effect.CLICK1;
+		}
 				pad.msg = conf.getString("pads." + pname + ".message");
 
-				String sound = conf.getString("pads." + pname + ".sound").toUpperCase();
+				String sound = conf.getString("pads." + pname + ".sound", Sound.ENTITY_ENDER_DRAGON_HURT.name());
+				sound = (sound == null) ? Sound.ENTITY_ENDER_DRAGON_HURT.name() : sound.toUpperCase();
 				try {
 					pad.sound = Sound.valueOf(sound);
 				}
 				catch (Exception e) {
 					this.getLogger().warning("Invalid sound \"" + sound + "\" for \"" + pname + "\"!");
-                    pad.sound = Sound.ENTITY_ENDER_DRAGON_HURT; // set this as default
+		    pad.sound = Sound.ENTITY_ENDER_DRAGON_HURT; // set this as default
 				}
 				PadList.add(pad);
 			}
@@ -106,45 +120,49 @@ public class BouncyPads extends JavaPlugin implements Listener {
 		
 		for (PadType p : PadList) {
 			Debug("Pad config:");
-			Debug("  top       : " + ((p.top == null) ? "ANY" : p.top));
-			Debug("  middle    : " + ((p.middle == null) ? "ANY" : p.middle));
-			Debug("  bottom    : " + ((p.bottom == null) ? "ANY" : p.bottom));
-			Debug("  multiplier: " + p.multiplier);
-			Debug("  velocity  : " + p.velocity);
-			Debug("  sound     : " + p.sound);
-			Debug("  effect    : " + p.effect);
-			Debug("  message   : " + p.msg);
+			Debug("	 top	   : " + ((p.top == null) ? "ANY" : p.top));
+			Debug("	 middle	   : " + ((p.middle == null) ? "ANY" : p.middle));
+			Debug("	 bottom	   : " + ((p.bottom == null) ? "ANY" : p.bottom));
+			Debug("	 multiplier: " + p.multiplier);
+			Debug("	 velocity  : " + p.velocity);
+			Debug("	 sound	   : " + p.sound);
+			Debug("	 effect	   : " + p.effect);
+			Debug("	 message   : " + p.msg);
 		}
 		
 		return true;
 	}
-	
 	private PadType getPadType(Player player) {
-		Location loc = player.getLocation();
-		Material pt = loc.getBlock().getType();
-		Material pm = null; // cached inside loop
-		Material pb = null; // cached inside loop
+		// Work on block references to avoid mutating the Location object
+		Block block = player.getLocation().getBlock();
+		Material topMat = block.getType();
 
-		// Avoid tiggering while flying above bouncy pads
-		// NOTE: Does not avoid flying above non-solid blocks if player is inside the same block as the non-solid block
-		if ((pt == Material.AIR) && (loc.getBlock().getRelative(BlockFace.DOWN).getType().isSolid())) {
-			loc.subtract(0, 1, 0);
-			pt = loc.getBlock().getType();  
+		// Avoid triggering while flying above bouncy pads
+		if (topMat == Material.AIR && block.getRelative(BlockFace.DOWN).getType().isSolid()) {
+			block = block.getRelative(BlockFace.DOWN);
+			topMat = block.getType();
 		}
-		
+
+		Material middleMat = null;
+		Material bottomMat = null;
+
 		// Check the layers for relevant trigger combinations
 		for (PadType pad : PadList) {
-			if ((pad.top == null) || (pad.top == pt)) {
-				if (pm == null) { pm = loc.subtract(0, 1, 0).getBlock().getType(); }		// cache the middle block type
-				if ((pad.middle == null) || (pad.middle == pm)) {
-					if (pad.bottom == null) { return pad; }		// Wildcard on bottom block, don't bother checking it
-					if (pb == null) { pb = loc.subtract(0, 1, 0).getBlock().getType(); }	// cache the bottom block type
-					if (pad.bottom == pb) {
-						// We found a BouncyPad! Return it
-						return pad;
-					}
-				}
+			if (pad.top != null && pad.top != topMat)
+				continue;
+			if (pad.middle != null) {
+				if (middleMat == null)
+					middleMat = block.getRelative(BlockFace.DOWN).getType();
+				if (pad.middle != middleMat)
+					continue;
 			}
+			if (pad.bottom != null) {
+				if (bottomMat == null)
+					bottomMat = block.getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN).getType();
+				if (pad.bottom != bottomMat)
+					continue;
+			}
+			return pad;
 		}
 		return null;
 	}
@@ -167,7 +185,7 @@ public class BouncyPads extends JavaPlugin implements Listener {
 			if ((pad.msg != null) && (!pad.msg.isEmpty())) {
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', pad.msg));
 			}
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> bouncing.remove(player), 5L);
+	    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> bouncing.remove(player), 5L);
 
 			// Fire PlayerBouncedEvent (for other plugins to listen to)
 			Bukkit.getPluginManager().callEvent(new PlayerBouncedEvent(player, pad));
